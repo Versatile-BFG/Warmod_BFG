@@ -137,29 +137,6 @@ forward void OnResetHalf();
  */
 forward void OnResetMatch();
 
-/**
- * Sets the money for clients
- *
- * @param num1    Start Money as an integer.
- * @return        String - error or comfirm setting
- */
-
-stock void WM_PrintToChat(int client, char[] format, any ...)
-{
-	char message[4096];
-	VFormat(message, sizeof(message), format, 3);
-	char lines[12][256];
-	int numLines = ExplodeString(message, "\n", lines, 12, 256, true);
-	for (int i = 0; i < numLines; i++)
-	{
-		TrimString(lines[i]);
-		if (!StrEqual(lines[i], ""))
-		{
-			PrintToChat(client, "%s%s", CHAT_PREFIX, lines[i]);
-		}
-	}
-}
-
 stock void GetServerString(char[] format, int size)
 {
 	char NetIP[32];

@@ -225,7 +225,7 @@ char g_ct_name_escaped[64]; // pre-escaped for warmod logs
 
 /* clan tag */
 char g_clanTags[MAXPLAYERS +1 ][MAX_NAME_LENGTH];
-bool g_clanTagsChecked[MAXPLAYERS + 1] = false;
+bool g_clanTagsChecked[MAXPLAYERS + 1] = {false, ...};
 
 /* Config Offers */
 bool default_offer_ct = false;
@@ -279,9 +279,9 @@ ConVar mp_match_end_restart;
 ConVar wm_captain_from_file;
 int g_bo3_count = -1;
 int g_bo5_count = -1;
-int g_ChosenMapBo2[2] = -1;
-int g_ChosenMapBo3[3] = -1;
-int g_ChosenMapBo5[5] = -1;
+int g_ChosenMapBo2[2] = {-1, ...};
+int g_ChosenMapBo3[3] = {-1, ...};
+int g_ChosenMapBo5[5] = {-1, ...};
 int g_ChosenMap = -1;
 int g_MapListCount = 0;
 bool g_veto_s = false;
@@ -311,7 +311,7 @@ bool team_switch = false;
 ConVar wm_name_fix;
 
 /* BanOn Disconnect */
-bool g_disconnect[MAXPLAYERS + 1] = false;
+bool g_disconnect[MAXPLAYERS + 1] = {false, ...};
 ConVar wm_ban_on_disconnect;
 ConVar wm_ban_percentage;
 ConVar sv_kick_ban_duration;
@@ -336,7 +336,7 @@ ConVar mp_win_panel_display_time;
 
 /* Plugin info */
 #define UPDATE_URL				"https://warmod.bitbucket.io/updatefile.txt"
-#define WM_VERSION				"20.07.15.1214"
+#define WM_VERSION				"22.09.25.0046"
 #define WM_DESCRIPTION			"An automative service for CS:GO competition matches"
 
 public Plugin myinfo = {
@@ -851,7 +851,7 @@ public void OnClientPostAdminCheck(int client)
 		char log_string[384];
 		CS_GetLogString(client, log_string, sizeof(log_string));
 		
-		char country[4];
+		char country[3];
 		GeoipCode2(ip_address, country);
 		
 		EscapeString(ip_address, sizeof(ip_address));
@@ -1682,6 +1682,7 @@ public Action PauseTimeout(Handle timer)
 	PrintToChatAll("\x01 \x09[\x04%s\x09]\x01 %T", chat_prefix, "Pause Not Confirmed", LANG_SERVER);
 	g_pause_offered_ct = false;
 	g_pause_offered_t = false;
+	return Plugin_Continue;
 }
 
 public Action UnPauseTimer(Handle timer)
@@ -1694,11 +1695,13 @@ public Action UnPauseTimer(Handle timer)
 	ServerCommand("mp_unpause_match 1");
 	g_pause_offered_ct = false;
 	g_pause_offered_t = false;
+	return Plugin_Continue;
 }
 
 public Action ResetMatchTimer(Handle timer)
 {
 	ResetMatch(true, true);
+	return Plugin_Continue;
 }
 
 stock bool IsValidClient(int client)
@@ -2169,6 +2172,7 @@ public Action PlayOutTimeout(Handle timer)
 	}
 	playout_offer_t = false;
 	playout_offer_ct = false;
+	return Plugin_Continue;
 }
 
 public Action PlayOut(int client, int args)
@@ -2265,6 +2269,7 @@ public Action OverTimeTimeout(Handle timer)
 	}
 	overtime_offer_t = false;
 	overtime_offer_ct = false;
+	return Plugin_Continue;
 }
 
 public Action OverTime(int client, int args)
@@ -2368,6 +2373,7 @@ public Action DefaultTimeout(Handle timer)
 	}
 	default_offer_t = false;
 	default_offer_ct = false;
+	return Plugin_Continue;
 }
 
 public Action Default(int client, int args)
@@ -2829,6 +2835,7 @@ public Action Event_Round_Start(Handle event, const char[]name, bool dontBroadca
 		}
 	}
 //	Round_Start_Player_Names();
+	return Plugin_Continue;
 }
 
 public void Event_Round_Start_CMD()
@@ -2980,7 +2987,7 @@ public void Event_Round_Start_CMD()
 		
 		char player_name[64];
 		char player_money[10];
-		char has_weapon[1];
+		char has_weapon[2];
 		int pri_weapon;
 		
 		// display team players money
@@ -3056,6 +3063,7 @@ public Action SetRandomTeamNameTag(Handle timer)
 		}
 		g_tag_set = true;
 	}
+	return Plugin_Continue;
 }
 
 public Action AskTeamMoney(int client, int args)
@@ -3090,7 +3098,7 @@ stock void ShowTeamMoney(int client)
 	
 	char player_name[64];
 	char player_money[10];
-	char has_weapon[1];
+	char has_weapon[2];
 	int pri_weapon;
 	
 	PrintToChat(client, "\x01--------");
@@ -3139,13 +3147,14 @@ public Action LogPlayerStatsTimer (Handle timer, int winner) {
 			LogPlayerStats(i);
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Round_End(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	int winner = GetEventInt(event, "winner");
@@ -3208,7 +3217,7 @@ public Action Event_Round_End(Handle event, const char[]name, bool dontBroadcast
 		
 		if (!g_live)
 		{
-			return;
+			return Plugin_Continue;
 		}
 		
 		if (!g_t_money)
@@ -3233,6 +3242,7 @@ public Action Event_Round_End(Handle event, const char[]name, bool dontBroadcast
 			}
 		}
 	}
+	return Plugin_Continue;
 }
 
 public void Event_Round_Restart(Handle cvar, const char[]oldVal, const char[]newVal)
@@ -3261,7 +3271,7 @@ public Action Event_Round_Freeze_End(Handle event, const char[]name, bool dontBr
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	FreezeTime = false;
@@ -3280,13 +3290,14 @@ public Action Event_Round_Freeze_End(Handle event, const char[]name, bool dontBr
 			LogSimpleEvent(event_name, sizeof(event_name));
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Player_Blind(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -3300,13 +3311,14 @@ public Action Event_Player_Blind(Handle event, const char[]name, bool dontBroadc
 			LogEvent("{\"event\": \"player_blind\", \"round\": %i, \"player\": %s, \"duration\": %.2f}", g_round, log_string, GetEntPropFloat(client, Prop_Send, "m_flFlashDuration"));
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Player_Hurt(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -3412,13 +3424,14 @@ public Action Event_Player_Hurt(Handle event, const char[]name, bool dontBroadca
 		}
 		round_health[victim] = vHealth;
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Player_Death(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
@@ -3579,13 +3592,14 @@ public Action Event_Player_Death(Handle event, const char[]name, bool dontBroadc
 		// respawn if warmup
 		CreateTimer(0.1, RespawnPlayer, victim);
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Player_Name(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -3610,13 +3624,14 @@ public Action Event_Player_Name(Handle event, const char[]name, bool dontBroadca
 	{
 		CreateTimer(0.1, UpdateInfo);
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Player_Disc_Pre(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -3650,11 +3665,13 @@ public Action Event_Player_Disc_Pre(Handle event, const char[]name, bool dontBro
 		LogEvent("{\"event\": \"player_disconnect\", \"round\": %i, \"player\": %s, \"reason\": \"%s\"}", g_round, log_string, reason);
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Player_Team_Post (Handle event, const char[]name, bool dontBroadcast) {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	FreezeTimeSpawn(client);
+	return Plugin_Continue;
 }
 
 public void FreezeTimeSpawn(int client) {
@@ -3669,7 +3686,7 @@ public Action Event_Player_Team(Handle event, const char[]name, bool dontBroadca
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -3727,6 +3744,7 @@ public Action Event_Player_Team(Handle event, const char[]name, bool dontBroadca
 		// spawn player if warmup
 		CreateTimer(0.1, RespawnPlayer, client);
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Player_Spawned(Handle event, const char[] name, bool dontBroadcast)
@@ -3770,13 +3788,14 @@ public Action Event_Player_Spawned(Handle event, const char[] name, bool dontBro
 			}
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Bomb_PickUp(Handle event, const char[] name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -3793,13 +3812,14 @@ public Action Event_Bomb_PickUp(Handle event, const char[] name, bool dontBroadc
 		LogEvent("{\"event\": \"bomb_pickup\", \"round\": %i, \"player\": %s}", g_round, log_string);
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Bomb_Dropped(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -3816,13 +3836,14 @@ public Action Event_Bomb_Dropped(Handle event, const char[]name, bool dontBroadc
 		LogEvent("{\"event\": \"bomb_dropped\", \"round\": %i, \"player\": %s}", g_round, log_string);
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Bomb_Plant_Begin(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -3832,13 +3853,14 @@ public Action Event_Bomb_Plant_Begin(Handle event, const char[]name, bool dontBr
 		CS_GetAdvLogString(GetClientOfUserId(GetEventInt(event, "userid")), log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"bomb_plant_begin\", \"round\": %i, \"player\": %s, \"site\": %d}", g_round, log_string, GetEventInt(event, "site"));
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Bomb_Plant_Abort(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -3848,6 +3870,7 @@ public Action Event_Bomb_Plant_Abort(Handle event, const char[]name, bool dontBr
 		CS_GetAdvLogString(GetClientOfUserId(GetEventInt(event, "userid")), log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"bomb_plant_abort\", \"round\": %i, \"player\": %s, \"site\": %d}", g_round, log_string, GetEventInt(event, "site"));
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Bomb_Planted(Handle event, const char[]name, bool dontBroadcast)
@@ -3856,7 +3879,7 @@ public Action Event_Bomb_Planted(Handle event, const char[]name, bool dontBroadc
 	
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -3866,13 +3889,14 @@ public Action Event_Bomb_Planted(Handle event, const char[]name, bool dontBroadc
 		CS_GetAdvLogString(GetClientOfUserId(GetEventInt(event, "userid")), log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"bomb_planted\", \"round\": %i, \"player\": %s, \"site\": %d}", g_round, log_string, GetEventInt(event, "site"));
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Bomb_Defuse_Begin(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -3884,13 +3908,14 @@ public Action Event_Bomb_Defuse_Begin(Handle event, const char[]name, bool dontB
 		CS_GetAdvLogString(client, log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"bomb_defuse_begin\", \"round\": %i, \"player\": %s, \"kit\": %d}", g_round, log_string, GetEventInt(event, "site"), GetEventBool(event, "haskit"));
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Bomb_Defuse_Abort(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -3900,13 +3925,14 @@ public Action Event_Bomb_Defuse_Abort(Handle event, const char[]name, bool dontB
 		CS_GetAdvLogString(GetClientOfUserId(GetEventInt(event, "userid")), log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"bomb_defuse_abort\", \"round\": %i, \"player\": %s}", g_round, log_string);
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Bomb_Defused(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -3918,13 +3944,14 @@ public Action Event_Bomb_Defused(Handle event, const char[]name, bool dontBroadc
 		CS_GetAdvLogString(client, log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"bomb_defused\", \"round\": %i, \"player\": %s, \"site\": %d}", g_round, log_string, GetEventInt(event, "site"));
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Bomb_Exploded(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -3934,15 +3961,16 @@ public Action Event_Bomb_Exploded(Handle event, const char[]name, bool dontBroad
 	{
 		char log_string[384];
 		CS_GetAdvLogString(client, log_string, sizeof(log_string));
-		LogEvent("{\"event\": \"bomb_defused\", \"round\": %i, \"player\": %s, \"site\": %d}", g_round, log_string, GetEventInt(event, "site"));
+		LogEvent("{\"event\": \"bomb_exploded\", \"round\": %i, \"player\": %s, \"site\": %d}", g_round, log_string, GetEventInt(event, "site"));
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Weapon_Fire(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -4002,13 +4030,14 @@ public Action Event_Weapon_Fire(Handle event, const char[]name, bool dontBroadca
 			}
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Detonate_Flash(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -4018,13 +4047,14 @@ public Action Event_Detonate_Flash(Handle event, const char[]name, bool dontBroa
 		CS_GetAdvLogString(GetClientOfUserId(GetEventInt(event, "userid")), log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"grenade_detonate\", \"round\": %i, \"player\": %s, \"grenade\": \"flashbang\"}", g_round, log_string);
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Detonate_Smoke(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats	
@@ -4034,13 +4064,14 @@ public Action Event_Detonate_Smoke(Handle event, const char[]name, bool dontBroa
 		CS_GetAdvLogString(GetClientOfUserId(GetEventInt(event, "userid")), log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"grenade_detonate\", \"round\": %i, \"player\": %s, \"grenade\": \"smokegrenade\"}", g_round, log_string);
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Detonate_HeGrenade(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -4050,13 +4081,14 @@ public Action Event_Detonate_HeGrenade(Handle event, const char[]name, bool dont
 		CS_GetAdvLogString(GetClientOfUserId(GetEventInt(event, "userid")), log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"grenade_detonate\", \"round\": %i, \"player\": %s, \"grenade\": \"hegrenade\"}", g_round, log_string);
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Detonate_Molotov(Handle event, char[] name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -4066,13 +4098,14 @@ public Action Event_Detonate_Molotov(Handle event, char[] name, bool dontBroadca
 		CS_GetAdvLogString(GetClientOfUserId(GetEventInt(event, "userid")), log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"grenade_detonate\", \"round\": %i, \"player\": %s, \"grenade\": \"molotov\"}", g_round, log_string);
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Detonate_Decoy(Handle event, char[] name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -4082,13 +4115,14 @@ public Action Event_Detonate_Decoy(Handle event, char[] name, bool dontBroadcast
 		CS_GetAdvLogString(GetClientOfUserId(GetEventInt(event, "userid")), log_string, sizeof(log_string));
 		LogEvent("{\"event\": \"grenade_detonate\", \"round\": %i, \"player\": %s, \"grenade\": \"decoy\"}", g_round, log_string);
 	}
+	return Plugin_Continue;
 }
 
 public Action Event_Item_Pickup(Handle event, const char[]name, bool dontBroadcast)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	// stats
@@ -4108,6 +4142,7 @@ public Action Event_Item_Pickup(Handle event, const char[]name, bool dontBroadca
 			LogEvent("{\"event\": \"item_pickup\", \"round\": %i, \"player\": %s, \"item\": \"%s\"}", g_round, log_string, item);
 		}
 	}
+	return Plugin_Continue;
 }
 
 void AddScore(int team)
@@ -5143,7 +5178,7 @@ void ReadyChecked()
 		
 		char save_dir[128];
 		GetConVarString(wm_save_dir, save_dir, sizeof(save_dir));
-		char file_prefix[1];
+		char file_prefix[2];
 		if (GetConVarBool(wm_prefix_logs))
 		{
 			file_prefix = "_";
@@ -5352,6 +5387,7 @@ public Action Lo3Timer(Handle timer)
 		GetServerString(serverstring, sizeof(serverstring));
 		LogEvent("{\"event\": \"live_on_3\", \"map\": \"%s\", \"teams\": [{\"name\": \"%s\", \"team\": %d}, {\"name\": \"%s\", \"team\": %d}], \"status\": %d, \"settings\": {\"max_rounds\": %d, \"overtime_enabled\": %d, \"overtime_max_rounds\": %d}, \"server\": %s, \"competition\": \"%s\", \"event_name\": \"%s\", \"version\": \"%s\"}", g_map, g_t_name_escaped, CS_TEAM_T, g_ct_name_escaped, CS_TEAM_CT, UpdateStatus(), GetConVarInt(mp_maxrounds), GetConVarInt(mp_overtime_enable), GetConVarInt(mp_overtime_maxrounds), serverstring, g_competition, g_event, WM_VERSION);
 	}
+	return Plugin_Continue;
 }
 
 static void LiveText() {
@@ -5472,6 +5508,7 @@ public Action Ko3Timer(Handle timer)
 	ServerCommand("mp_restartgame 1");
 	PrintToChatAll("\x01 \x09[\x04%s\x09]\x01 %t", chat_prefix, "Knife On 3");
 	KnifeOn2 = true;
+	return Plugin_Continue;
 }
 
 public Action Command_JoinTeam(int client, const char[]command, int args)
@@ -6202,6 +6239,7 @@ public int Handler_ReadySystem(Handle menu, MenuAction action, int param1, int p
 			g_cancel_list[param1] = true;
 		}
 	}
+	return 0;
 }
 
 //Knife vote stay
@@ -6335,6 +6373,7 @@ public Action Switch(int client, int args)
 public int Handler_DoNothing(Handle menu, MenuAction action, int param1, int param2)
 {
 	/* Do nothing */
+	return 0;
 }
 
 public void SetAllCancelled(bool cancelled)
@@ -6877,44 +6916,49 @@ public Action Timer_DelayedResetConfig(Handle timer) {
 	char end_config[128];
 	GetConVarString(wm_reset_config, end_config, sizeof(end_config));
 	ServerCommand("exec %s", end_config);
+	return Plugin_Continue;
 }
 
 public Action Swap(Handle timer)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	if (!g_live)
 	{
 		CS_SwapTeams();
 	}
+	return Plugin_Continue;
 }
 
 public Action DispInfoLimiterTrue(Handle timer)
 {
 	g_DispInfoLimiter = true;
 	ShowInfo(0, true, false, 0);
+	return Plugin_Continue;
 }
 
 public Action setNameLimiterTrue(Handle timer)
 {
 	g_setNameLimiter = true;
 	CheckReady();
+	return Plugin_Continue;
 }
 
 public Action UpdateInfo(Handle timer)
 {
 	if (!IsActive(0, true))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	if (!g_live)
 	{
 		ShowInfo(0, true, false, 0);
 	}
+	return Plugin_Continue;
 }
 
 public Action StopRecord(Handle timer)
@@ -6951,11 +6995,13 @@ public Action StopRecord(Handle timer)
 		}
 		CreateTimer(2.0, RecordingFalse);
 	}
+	return Plugin_Continue;
 }
 
 public Action RecordingFalse(Handle timer)
 {
 	g_bRecording = false;
+	return Plugin_Continue;
 }
 
 public Action LogFileUpload(Handle timer)
@@ -6983,6 +7029,7 @@ public Action LogFileUpload(Handle timer)
 			}
 		}
 	}
+	return Plugin_Continue;
 }
 
 //Coded by Thrawn2 from tAutoDemoUpload plugin [Built in for better execution]
@@ -7006,6 +7053,7 @@ public Action Timer_UploadDemo(Handle timer, Handle hDataPack)
 			EasyFTP_UploadFile(g_sFtpTargetDemo, sDemoPath, "/", UploadComplete);
 		}
 	}
+	return Plugin_Continue;
 }
 
 public void CompressionZip(char[] sDemoPath)
@@ -7069,6 +7117,7 @@ public Action Timer_UploadLog(Handle timer, Handle hDataPackLog)
 		ReadPackString(hDataPackLog, sLogPath, sizeof(sLogPath));
 		EasyFTP_UploadFile(g_sFtpTargetLog, sLogPath, "/", UploadComplete);
 	}
+	return Plugin_Continue;
 }
 
 public int CompressionComplete(BZ_Error iError, char[] inFile, char[] outFile, any data)
@@ -7086,6 +7135,7 @@ public int CompressionComplete(BZ_Error iError, char[] inFile, char[] outFile, a
 			EasyFTP_UploadFile(g_sFtpTargetDemo, inFile, "/", UploadComplete);
 		}
 	}
+	return 0;
 }
 
 public int UploadComplete(const char[]sTarget, const char[]sLocalFile, const char[]sRemoteFile, int iErrorCode, any data) {
@@ -7121,6 +7171,7 @@ public int UploadComplete(const char[]sTarget, const char[]sLocalFile, const cha
 			}
 		}
 	}
+	return 0;
 }
 
 public void Cvar_Changed(Handle convar, const char[]oldValue, const char[]newValue)
@@ -7163,6 +7214,7 @@ public Action HalfTime(Handle timer)
 	ServerCommand("mp_warmup_start");
 	ReadySystem(true);
 	ShowInfo(0, true, false, 0);
+	return Plugin_Continue;
 }
 
 stock void LogSimpleEvent(char[] event_name, int size)
@@ -7174,7 +7226,7 @@ stock void LogSimpleEvent(char[] event_name, int size)
 	LogEvent("%s", json);
 }
 
-stock void LogEvent(const char[]format, any:...)
+stock void LogEvent(const char[]format, any ...)
 {
 	char event[1024];
 	VFormat(event, sizeof(event), format, 2);
@@ -7209,7 +7261,7 @@ stock void LogEvent(const char[]format, any:...)
 void LogPlayers()
 {
 	char ip_address[32];
-	char country[2];
+	char country[3];
 	char log_string[384];
 	for (int i = 1; i <= MaxClients; i++)
 	{
@@ -7293,6 +7345,7 @@ public Action Stats_Trace(Handle timer)
 			}
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action RenameLogs(Handle timer)
@@ -7326,6 +7379,7 @@ public Action RenameLogs(Handle timer)
 		Format(g_sLogPath, sizeof(g_sLogPath), new_log_filename);
 	}
 	CreateTimer(15.0, RenameDemos);
+	return Plugin_Continue;
 }
 
 public Action RenameDemos(Handle timer)
@@ -7346,6 +7400,7 @@ public Action RenameDemos(Handle timer)
 	}
 	RenameFile(new_demo_filename, old_demo_filename);
 	Format(g_sDemoPath, sizeof(g_sDemoPath), new_demo_filename);
+	return Plugin_Continue;
 }
 
 void ResetPlayerStats(int client)
@@ -7657,11 +7712,13 @@ public int MenuHandler(Handle topmenu, TopMenuAction action, TopMenuObject objec
 			ActiveToggle(param, 0);
 		}
 	}
+	return 0;
 }
 
 public Action RestartRound(Handle timer, any delay)
 {
 	ServerCommand("mp_restartgame %d", delay);
+	return Plugin_Continue;
 }
 
 public Action PrintToChatDelayed(Handle timer, Handle datapack)
@@ -7670,6 +7727,7 @@ public Action PrintToChatDelayed(Handle timer, Handle datapack)
 	ResetPack(datapack);
 	ReadPackString(datapack, text, sizeof(text));
 	ServerCommand("say %s", text);
+	return Plugin_Continue;
 }
 
 public Action CheckNames(Handle timer, any client)
@@ -7702,6 +7760,7 @@ public Action CheckNames(Handle timer, any client)
 			}
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action RespawnPlayer(Handle timer, int client)
@@ -7715,6 +7774,7 @@ public Action RespawnPlayer(Handle timer, int client)
 			SetEntData(client, g_iAccount, GetConVarInt(mp_startmoney));
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action HelpText(Handle timer, int client)
@@ -7770,6 +7830,7 @@ public Action ShowPluginInfo(Handle timer, int client)
 		PrintToConsole(client, "Current settings: %s: %d / %s: %d / mp_match_can_clinch: %d", max_rounds, GetConVarInt(mp_maxrounds), min_ready, GetConVarInt(wm_min_ready), GetConVarInt(mp_match_can_clinch));
 		PrintToConsole(client, "===============================================================================");
 	}
+	return Plugin_Continue;
 }
 
 public Action WMVersion(int client, int args)
@@ -7965,6 +8026,7 @@ public Action VetoTimeout(Handle timer)
 	PrintToChatAll("\x01 \x09[\x04%s\x09]\x01 %T", chat_prefix, "Veto Offer Not Confirmed", LANG_SERVER);
 	veto_offer_t = false;
 	veto_offer_ct = false;
+	return Plugin_Continue;
 }
 
 public Action Veto_Bo1(int client, int args)
@@ -8359,7 +8421,7 @@ public void SetCapt2(int client)
 	}
 }
 
-stock void LogVetoEvent(const char[]format, any:...)
+stock void LogVetoEvent(const char[]format, any ...)
 {
 	char event[1024];
 	VFormat(event, sizeof(event), format, 2);
@@ -8533,6 +8595,7 @@ public Action GiveVetoPickMenu(int client) {
 	AddMenuItem(menu, "First", "First");
 	AddMenuItem(menu, "Second", "Second");
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	return Plugin_Continue;
 }
 
 public int VetoPickHandler(Menu menu, MenuAction action, int param1, int param2)
@@ -8564,6 +8627,7 @@ public int VetoPickHandler(Menu menu, MenuAction action, int param1, int param2)
 	{
 		CloseHandle(menu);
 	}
+	return 0;
 }
 
 public void GiveVetoMenu(int client) {
@@ -8594,6 +8658,7 @@ public int GiveVetoMenuSelect(int client) {
 		}
 	}
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	return 0;
 }
 
 static int GetNumMapsLeft() {
@@ -8890,6 +8955,7 @@ public int VetoHandler(Handle menu, MenuAction action, int param1, int param2)
 	{
 		CloseHandle(menu);
 	}
+	return 0;
 }
 
 public void DisplayVeto(int other)
@@ -9645,6 +9711,7 @@ public Action SetTagClientDefault(Handle timer)
 			}
 		}
 	}
+	return Plugin_Continue;
 }
 
 public void SetTagNotReady(int client)
@@ -9681,9 +9748,10 @@ public void SetTagReady(int client)
 	}
 }
 
-public int Updater_OnPluginUpdated()
+public void Updater_OnPluginUpdated()
 {
 	ReloadPlugin();
+	Updater_ReloadPlugin();
 }
 
 /* Team logo code */
@@ -9892,6 +9960,7 @@ public Action GiveDivPickMenu(int client, char[] selectDiv)
 	CloseHandle(kv);
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	return Plugin_Continue;
 }
 
 public int DivPickHandler(Menu menu, MenuAction action, int param1, int param2)
@@ -9915,7 +9984,7 @@ public int DivPickHandler(Menu menu, MenuAction action, int param1, int param2)
 				ServerCommand("mp_teamlogo_1 %s", info);
 			}
 			CheckReady();
-			return;
+			return 0;
 		}
 		
 		Handle kv = CreateKeyValues("TeamLogos");
@@ -9944,6 +10013,7 @@ public int DivPickHandler(Menu menu, MenuAction action, int param1, int param2)
 	{
 		CloseHandle(menu);
 	}
+	return 0;
 }
 
 public Action GiveLogoPickMenu(int client, char[] div)
@@ -9973,6 +10043,7 @@ public Action GiveLogoPickMenu(int client, char[] div)
 	CloseHandle(kv);
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	return Plugin_Continue;
 }
 
 public int LogoPickHandler(Menu menu, MenuAction action, int param1, int param2)
@@ -10047,6 +10118,7 @@ public int LogoPickHandler(Menu menu, MenuAction action, int param1, int param2)
 	{
 		CloseHandle(menu);
 	}
+	return 0;
 }
 
 public Action SetName(int client, int args)
@@ -10531,6 +10603,25 @@ public void checksafe(int client) {
 	DeleteFile(cfgFile);
 }
 
+/**
+ * Sets the money for clients
+ *
+ * @param num1    Start Money as an integer.
+ * @return        String - error or comfirm setting
+ */
 
-
-//CS:GO was not launched in Trusted Launch mode
+stock void WM_PrintToChat(int client, char[] format, any ...)
+{
+	char message[4096];
+	VFormat(message, sizeof(message), format, 3);
+	char lines[12][256];
+	int numLines = ExplodeString(message, "\n", lines, 12, 256, true);
+	for (int i = 0; i < numLines; i++)
+	{
+		TrimString(lines[i]);
+		if (!StrEqual(lines[i], ""))
+		{
+			PrintToChat(client, "%s%s", chat_prefix, lines[i]);
+		}
+	}
+}
