@@ -18,7 +18,6 @@
 
 bool SQL_DEBUG = false;
 
-
 int g_player_list[MAXPLAYERS + 1];
 bool g_cancel_list[MAXPLAYERS + 1];
 int g_scores[2][2];
@@ -64,13 +63,13 @@ int match_id;
 // Offsets
 int g_iAccount = -1;
 
-/* stats */
+/* Stats */
 bool g_log_warmod_dir = false;
 char g_log_filename[128];
 Handle g_log_file = INVALID_HANDLE;
 char g_log_veto_filename[128];
 Handle g_log_veto_file = INVALID_HANDLE;
-char weapon_list[][] = {"ak47", "m4a1_silencer", "m4a1_silencer_off", "m4a1", "galilar", "famas", "awp", "p250", "cz75a", "glock", "hkp2000", "usp_silencer", "usp_silencer_off", "ump45", "p90", "bizon", "mp7", "nova", "knife", "elite", "fiveseven", "deagle", "revolver", "tec9", "ssg08", "scar20", "aug", "sg556", "g3sg1", "mac10", "mp9", "mag7", "negev", "m249", "sawedoff", "incgrenade", "flashbang", "smokegrenade", "hegrenade", "molotov", "decoy", "taser"};
+char weapon_list[][] = {"ak47", "m4a1_silencer", "m4a1_silencer_off", "m4a1", "galilar", "famas", "awp", "p250", "cz75a", "glock", "hkp2000", "usp_silencer", "usp_silencer_off", "ump45", "p90", "bizon", "mp7", "mp5sd", "nova", "knife", "elite", "fiveseven", "deagle", "revolver", "tec9", "ssg08", "scar20", "aug", "sg556", "g3sg1", "mac10", "mp9", "mag7", "negev", "m249", "sawedoff", "incgrenade", "flashbang", "smokegrenade", "hegrenade", "molotov", "decoy", "taser"};
 int weapon_stats[MAXPLAYERS + 1][NUM_WEAPONS][LOG_HIT_NUM];
 int clutch_stats[MAXPLAYERS + 1][CLUTCH_NUM];
 int assist_stats[MAXPLAYERS + 1][ASSIST_NUM];
@@ -89,7 +88,7 @@ char g_competition[255];
 char g_event[255];
 char g_server[255];
 
-/* forwards */
+/* Forwards */
 Handle g_f_on_lo3 = INVALID_HANDLE;
 Handle g_f_on_round_end = INVALID_HANDLE;
 Handle g_f_on_half_time = INVALID_HANDLE;
@@ -98,7 +97,7 @@ Handle g_f_on_reset_match = INVALID_HANDLE;
 Handle g_f_on_end_match = INVALID_HANDLE;
 Handle g_f_livewire_log_event = INVALID_HANDLE;
 
-/* cvars */
+/* Cvars */
 ConVar wm_active;
 ConVar wm_stats_enabled;
 ConVar wm_stats_method;
@@ -154,15 +153,14 @@ ConVar mp_teamflag_2;
 ConVar wm_ready_tag;
 ConVar wm_ready_panel;
 
-
 ConVar mp_startmoney;
 ConVar hostname;
 
-/* ready system */
+/* Ready System */
 Handle g_m_ready_up = INVALID_HANDLE;
 bool g_ready_enabled = false;
 
-/* switches */
+/* Switches */
 bool g_active = true;
 bool g_start = false;
 bool g_match = false;
@@ -208,22 +206,22 @@ bool g_bRecording = false;
 ConVar wm_autodemoupload_completed;
 bool g_MatchComplete = false;
 
-/* Warmod safemode */
+/* Warmod Safemode */
 ConVar wm_warmod_safemode;
 
-/* modes */
+/* Modes */
 int g_overtime_mode = 0;
 
-/* chat prefix */
+/* Chat Prefix */
 char chat_prefix[64];
 
-/* teams */
+/* Teams */
 char g_t_name[64];
 char g_t_name_escaped[64]; // pre-escaped for warmod logs
 char g_ct_name[64];
 char g_ct_name_escaped[64]; // pre-escaped for warmod logs
 
-/* clan tag */
+/* Clan Tag */
 char g_clanTags[MAXPLAYERS +1 ][MAX_NAME_LENGTH];
 bool g_clanTagsChecked[MAXPLAYERS + 1] = {false, ...};
 
@@ -240,8 +238,7 @@ bool playout_offer_ct = false;
 bool playout_offer_t = false;
 Handle g_h_stored_timer_pl = INVALID_HANDLE;
 
-
-/* Pause and Unpause */
+/* Pause & Unpause */
 bool g_pause_freezetime = false;
 bool g_pause_offered_t = false;
 bool g_pause_offered_ct = false;
@@ -316,13 +313,16 @@ ConVar wm_ban_on_disconnect;
 ConVar wm_ban_percentage;
 ConVar sv_kick_ban_duration;
 
-/* Random Team Names and Logos */
-static char g_teamName[][] = {"3DMAX", "Astana Dragons", "Bravado Gaming", "Cloud9", "Counter Logic Gaming", "Clan Mystik", "compLexity", "Copenhagen Wolves", "dAT Team", "Team Dignitas", "Epsilon eSports", "ESC Gaming", "Flipsid3 Tactics", "fnatic", "HellRaisers", "iBUYPOWER", "Team Wolf", "Keyd Stars", "London Conspiracy", "Team LDLC.com", "LGB eSports", "mousesports", "MyXMG", "Natus Vincere", "Ninjas in Pyjamas", "Team EnVyUs", "PENTA Sports", "Planetkey Dynamics", "Reason Gaming", "Team SoloMid", "Titan", "Vox Eminor", "VeryGames", "Virtus.Pro"};
-static char g_teamTag[][] = {"3DMAX", "Astana Dragons", "Bravado", "Cloud9", "CLG", "Clan Mystik", "compLexity", "CPH Wolves", "dAT Team", "Dignitas", "Epsilon", "ESC", "Flipsid3", "fnatic", "HellRaisers", "iBUYPOWER", "Team Wolf", "Keyd Stars", "Ldn-Con", "Team LDLC", "LGB", "mousesports", "MyXMG", "Na`Vi", "NiP", "Team EnVyUs", "PENTA", "Planetkey", "Reason", "TSM", "Titan", "Vox Eminor", "VeryGames", "Virtus.Pro"};
-static char g_teamLogo[][] = {"3dm", "ad", "bravg", "c9", "clg", "cm", "col", "cw", "dat", "dig", "eps", "esc", "flip", "fntc", "hlr", "ibp", "indw", "keyd", "lc", "ldlc", "lgb", "mss", "myxmg", "navi", "nip", "nv", "penta", "pkd", "rgg", "tsm", "tit", "ve", "vg", "vp"};
+/* Random Team Names & Logos */
+static char g_teamName[][] = {	"Astralis", "AVANGAR",	"BIG",	"Bad News Eagles",	"Bravado Gaming",	"Cloud9",	"CPH Flames",	"compLexity Gaming",	"Team Dignitas",	"Entropiq",		"Eternal Fire",	"Evil Geniuses",	"ENCE eSports",	"FURIA Esports",	"FaZe Clan",	"Fnatic",	"forZe",	"Team GamerLegion", "Grayhound Gaming",	"GODSENT",	"G2 Esports",	"Gambit Esports",	"Heroic",	"HellRaisers",	"Team iBUYPOWER",	"IHC Esports",	"INTZ eSports",		"Imperial Esports",	"Immortals",	"Keyd Stars",	"Luminosity Gaming",	"Team Liquid",	"Team Spirit",	"MIBR",		"Movistar Riders",	"MOUZ",		"Natus Vincere",	"Ninjas in Pyjamas",	"9z Team",	"North",	"OG",	"Outsiders",	"paiN Gaming",	"Renegades",	"Rogue",	"Sprout",	"SK Gaming",	"YNG Sharks",	"TYLOO",	"Heroic",	"Team Vitality",	"Vega Squadron",	"Virtus.Pro", 	"ZeroZero Nation"};
+static char g_teamTag[][] = {	"Astralis", "AVG",		"BIG",	"bNE-",				"bvd_",				"Cloud9",	"CPH Flames",	"-coL",					"Dignitas",			"Entropiq",		"ETERNAL",		"EG",				"ENCE",			"FURIA",			"FAZE",			"Fnatic",	"forZe",	"GL |",				"GHOUND",			"GODSENT",	"G2 Esports",	"Gambit",			"Heroic",	"HellRaisers",	"iBUYPOWER",		"IHC",			"INTZ",				"Imperial",			"IMT",			"Keyd",			"LG",					"Liquid",		"Spirit",		"MIBR",		"Movistar",			"MOUZ",		"Na`Vi",			"NiP",					"9z",		"North",	"OG",	"Outsiders",	"paiN",			"RNG",			"Rogue",	"Sprout •",	"SK",			"Sharks",		"TyLoo",	"Heroic",	"Vitality",			"Vega",				"VP", 			"00 Nation"};
+static char g_teamLogo[][] = {	"astr",		"avg",		"big",	"bne",				"bravg",			"c9",		"cope",			"cplx",					"dig",				"ent",			"eter",			"evl",				"ence",			"furi",				"faze",			"fntc",		"forz",		"gl",				"gray",				"god",		"g2",			"gamb",				"hero",		"hlr",			"ibp",				"ihc",			"intz",				"imp",				"imt",			"keyd",			"lumik",				"liq",			"spir",			"mibr",		"ride",				"mouz",		"navi",				"nip",					"nine",		"nor",		"og",	"out",			"pain",			"ren",			"rog",		"spr",		"sk",			"shrk",			"tyl",		"hero",		"vita",				"vega",				"vp", 			"zzn"};
+
 int g_teamNumber_ct = 0;
 int g_teamNumber_t = 0;
+
 bool g_tag_set = false;
+
 ConVar wm_random_team_names;
 
 bool g_first_load = true;
@@ -335,9 +335,9 @@ ConVar mp_halftime_duration;
 ConVar mp_win_panel_display_time;
 
 /* Plugin info */
-#define UPDATE_URL				"https://warmod.bitbucket.io/updatefile.txt"
-#define WM_VERSION				"22.09.26.1915"
-#define WM_DESCRIPTION			"An automative service for CS:GO competition matches"
+#define UPDATE_URL			"https://warmod.bitbucket.io/updatefile.txt"
+#define WM_VERSION			"22.11.06.1146"
+#define WM_DESCRIPTION		"An automative service for CS:GO competition matches"
 
 public Plugin myinfo = {
 	name = "[BFG] WarMod",
@@ -445,8 +445,7 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_veto5", Veto_Bo5, "Ask for a Bo5 Veto");
 	RegConsoleCmd("sm_vetomaps", Veto_Bo3_Maps, "Veto Bo3 Maps");
 	
-	/* admin commands */
-	
+	/* admin commands */	
 	RegAdminCmd("notlive", NotLive, ADMFLAG_CUSTOM1, "Declares half not live and restarts the round");
 	RegAdminCmd("nl", NotLive, ADMFLAG_CUSTOM1, "Declares half not live and restarts the round");
 	RegAdminCmd("cancelhalf", NotLive, ADMFLAG_CUSTOM1, "Declares half not live and restarts the round");
@@ -466,6 +465,7 @@ public void OnPluginStart()
 	RegAdminCmd("aswap", SwapAll, ADMFLAG_CUSTOM1, "Swap all players to the opposite team");
 	
 	RegAdminCmd("prac", Practice, ADMFLAG_CUSTOM1, "Puts server into a practice mode state");
+	
 	RegAdminCmd("warmup", WarmUp, ADMFLAG_CUSTOM1, "Puts server into a warm up state");
 	
 	RegAdminCmd("pwd", ChangePassword, ADMFLAG_PASSWORD, "Set or display the sv_password console variable");
@@ -485,19 +485,23 @@ public void OnPluginStart()
 	
 	RegAdminCmd("forceallready", ForceAllReady, ADMFLAG_CUSTOM1, "Forces all players to become ready");
 	RegAdminCmd("far", ForceAllReady, ADMFLAG_CUSTOM1, "Forces all players to become ready");
+	
 	RegAdminCmd("forceallunready", ForceAllUnready, ADMFLAG_CUSTOM1, "Forces all players to become unready");
 	RegAdminCmd("faur", ForceAllUnready, ADMFLAG_CUSTOM1, "Forces all players to become unready");
+	
 	RegAdminCmd("forceallspectate", ForceAllSpectate, ADMFLAG_CUSTOM1, "Forces all players to become a spectator");
 	RegAdminCmd("fas", ForceAllSpectate, ADMFLAG_CUSTOM1, "Forces all players to become a spectator");
 	
 	RegAdminCmd("lo3", ForceStart, ADMFLAG_CUSTOM1, "Starts the match regardless of player and ready count");
 	RegAdminCmd("forcestart", ForceStart, ADMFLAG_CUSTOM1, "Starts the match regardless of player and ready count");
 	RegAdminCmd("fs", ForceStart, ADMFLAG_CUSTOM1, "Starts the match regardless of player and ready count");
+	
 	RegAdminCmd("forceend", ForceEnd, ADMFLAG_CUSTOM1, "Ends the match regardless of status");
 	RegAdminCmd("fe", ForceEnd, ADMFLAG_CUSTOM1, "Ends the match regardless of status");
 	
 	RegAdminCmd("readyon", ReadyOn, ADMFLAG_CUSTOM1, "Turns on or restarts the ReadyUp System");
 	RegAdminCmd("ron", ReadyOn, ADMFLAG_CUSTOM1, "Turns on or restarts the ReadyUp System");
+	
 	RegAdminCmd("readyoff", ReadyOff, ADMFLAG_CUSTOM1, "Turns off the ReadyUp System if enabled");
 	RegAdminCmd("roff", ReadyOff, ADMFLAG_CUSTOM1, "Turns off the ReadyUp System if enabled");
 	
@@ -7821,13 +7825,13 @@ public Action ShowPluginInfo(Handle timer, int client)
 		PrintToConsole(client, "");
 		PrintToConsole(client, "Created by Versatile [BFG]");
 		PrintToConsole(client, "");
-		PrintToConsole(client, "Messagemode commands:				Aliases:");
-		PrintToConsole(client, "  /ready - Mark yourself as ready 		  /rdy /r");
-		PrintToConsole(client, "  /unready - Mark yourself as not ready 	  /unrdy /ur");
+		PrintToConsole(client, "Messagemode Commands:							Aliases:");
+		PrintToConsole(client, "  /ready - Mark yourself as ready 		  		  /rdy /r");
+		PrintToConsole(client, "  /unready - Mark yourself as not ready 	  	  /unrdy /ur");
 		PrintToConsole(client, "  /info - Display the Ready System if enabled 	  /i");
 		PrintToConsole(client, "  /scores - Display the match score if live 	  /score /s");
 		PrintToConsole(client, "");
-		PrintToConsole(client, "Current settings: %s: %d / %s: %d / mp_match_can_clinch: %d", max_rounds, GetConVarInt(mp_maxrounds), min_ready, GetConVarInt(wm_min_ready), GetConVarInt(mp_match_can_clinch));
+		PrintToConsole(client, "Current Settings: %s: %d / %s: %d / mp_match_can_clinch: %d", max_rounds, GetConVarInt(mp_maxrounds), min_ready, GetConVarInt(wm_min_ready), GetConVarInt(mp_match_can_clinch));
 		PrintToConsole(client, "===============================================================================");
 	}
 	return Plugin_Continue;

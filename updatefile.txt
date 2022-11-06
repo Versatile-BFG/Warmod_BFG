@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"	"22.09.26.1915"
-			"Previous"	"22.09.25.0046"
+			"Latest"	"22.11.06.1146"
+			"Previous"	"22.09.26.1915"
 		}
 
-		"Notes"	"More info @ forums.alliedmods.net/showthread.php?t=225474. For changes in 22.09.25.0046 look in thread"
+		"Notes"	"More info @ forums.alliedmods.net/showthread.php?t=225474. For changes in 22.11.06.1146 look in thread"
 
 	}
 
